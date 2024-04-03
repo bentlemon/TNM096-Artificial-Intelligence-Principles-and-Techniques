@@ -58,7 +58,7 @@ class Puzzle:
         self.closed = []
 
     def f(self, start, goal):
-        # Calculate the f-value for a given state
+        # Calculate the f-value for a given state (f(x) = )
         return self.h(start.data, goal) + start.level
 
     def h(self, start, goal):

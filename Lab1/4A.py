@@ -58,8 +58,8 @@ class Puzzle:
         self.closed = []
 
     def f(self, start, goal):
-        # Calculate the f-value for a given state
-        return self.h(start.data, goal) + start.level
+        # Calculate the f-value for a given state (f(x) = )
+        return self.h(start.data, goal)
 
     def h(self, start, goal):
         # Calculate the heuristic value (number of misplaced tiles) for a given state
