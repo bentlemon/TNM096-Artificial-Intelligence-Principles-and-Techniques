@@ -73,7 +73,9 @@ class Puzzle:
         return h1
 
     def process(self):
-        start_time = time.time()  # Record the starting time    
+        start_time = time.time()  # Record the starting time
+        iteration_count = 0  # Initialize iteration counter
+  
         # Define the initial and goal states
         start = [
             ['2', '5', '_'], 
@@ -89,11 +91,14 @@ class Puzzle:
         print("\n\n")
         while True:
             cur = self.open[0]
+            iteration_count += 1  # Increment iteration counter
             print("=====\n")
             for i in cur.data:
                 for j in i:
                     print(j, end=" ")
                 print("")
+            print("h1 value:", self.h(cur.data, goal))  # Print h value for the current state
+            print("=====\n")
             if self.h(cur.data, goal) == 0:
                 break
             for i in cur.generate_child():
@@ -107,6 +112,8 @@ class Puzzle:
 
         end_time = time.time()  # Record the ending time
         execution_time = end_time - start_time  # Calculate the execution time
+        
+        print("Iterations:", iteration_count)  # Print the total number of iterations
         print("Execution Time:", execution_time, "seconds")  # Print the execution time
 
     def check_state(self, c):
