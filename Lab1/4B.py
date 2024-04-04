@@ -25,9 +25,9 @@ class Node:
         if x2 >= 0 and x2 < len(self.data) and y2 >= 0 and y2 < len(self.data):
             # If the move is within bounds, perform the move
             temp_puz = self.copy(puz)
-            h1 = temp_puz[x2][y2]
+            h2 = temp_puz[x2][y2]
             temp_puz[x2][y2] = temp_puz[x1][y1]
-            temp_puz[x1][y1] = h1
+            temp_puz[x1][y1] = h2
             return temp_puz
         else:
             # If the move is out of bounds, return None
@@ -35,13 +35,13 @@ class Node:
 
     def copy(self, root):
         # Create a copy of the given puzzle state
-        h1 = []
+        h2 = []
         for i in root:
             t = []
             for j in i:
                 t.append(j)
-            h1.append(t)
-        return h1
+            h2.append(t)
+        return h2
 
     def find(self, puz, x):
         # Find the coordinates of a specific element in the puzzle state
@@ -62,13 +62,19 @@ class Puzzle:
         return self.h(start.data, goal)
 
     def h(self, start, goal):
-        # Calculate the heuristic value (number of misplaced tiles) for a given state
-        h1 = 0
+        # Calculate the heuristic value distance from the manhattandistance in one state
+        h2 = 0
         for i in range(0, 3):
             for j in range(0, 3):
                 if start[i][j] != goal[i][j] and start[i][j] != '_':
-                    h1 += 1
-        return h1
+                    h2 += self.calcManhattanDistance(start[i][j], goal, i, j)
+        return h2
+    
+    def calcManhattanDistance(self, value, goal, x, y):
+        for i in range(0, 3):
+            for j in range(0, 3):
+                if goal[i][j] == value:
+                    return abs(i - x) + abs(j - y)
 
     def process(self):
         # Define the initial and goal states
