@@ -64,20 +64,21 @@ class Puzzle:
         return self.h(start.data, goal)
 
     def h(self, start, goal):
-        # Calculate the heuristic value distance from the Manhattan distance in one state
-        h2 = 0
-        for i in range(0, 3):
-            for j in range(0, 3):
-                if start[i][j] != goal[i][j] and start[i][j] != '_':
-                    h2 += self.calcManhattanDistance(start[i][j], goal, i, j)
-        return h2
-    
-    def calcManhattanDistance(self, value, goal, x, y):
-        # Calculate the Manhattan distance between a tile and its goal position
-        for i in range(0, 3):
-            for j in range(0, 3):
-                if goal[i][j] == value:
-                    return abs(i - x) + abs(j - y)
+            h2 = 0
+            goal_positions = {}
+
+            for i in range(3):
+                for j in range(3):
+                    goal_positions[goal[i][j]] = (i, j)
+
+            for i in range(3):
+                for j in range(3):
+                    if start[i][j] != goal[i][j] and start[i][j] != '':
+                        value = start[i][j]
+                        goal_i, goal_j = goal_positions[value]
+                        h2 += abs(goal_i - i) + abs(goal_j - j)
+
+            return h2
 
     def process(self):
         start_time = time.time()  # Record the starting time  
@@ -131,7 +132,8 @@ class Puzzle:
                 return 1
         return 0
 
-# Execution Time: 0.04328298568725586 seconds
+#Iterations: 153
+#Execution Time: 0.35958385467529297 seconds
 
 # Create a Puzzle object and execute the process method
 puz = Puzzle()
