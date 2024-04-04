@@ -1,3 +1,5 @@
+import time  # Import the time module
+
 class Node:
     def __init__(self, data, level, fval):
         # Initialize the node with the provided data, level, and fvalue
@@ -62,7 +64,7 @@ class Puzzle:
         return self.h(start.data, goal)
 
     def h(self, start, goal):
-        # Calculate the heuristic value distance from the manhattandistance in one state
+        # Calculate the heuristic value distance from the Manhattan distance in one state
         h2 = 0
         for i in range(0, 3):
             for j in range(0, 3):
@@ -71,12 +73,14 @@ class Puzzle:
         return h2
     
     def calcManhattanDistance(self, value, goal, x, y):
+        # Calculate the Manhattan distance between a tile and its goal position
         for i in range(0, 3):
             for j in range(0, 3):
                 if goal[i][j] == value:
                     return abs(i - x) + abs(j - y)
 
     def process(self):
+        start_time = time.time()  # Record the starting time    
         # Define the initial and goal states
         start = [
             ['2', '5', '_'], 
@@ -108,6 +112,10 @@ class Puzzle:
             del self.open[0]
             self.open.sort(key=lambda x: x.fval, reverse=False)
 
+        end_time = time.time()  # Record the ending time
+        execution_time = end_time - start_time  # Calculate the execution time
+        print("Execution Time:", execution_time, "seconds")  # Print the execution time
+
     def check_state(self, c):
         # Check if a state has already been visited
         for i in self.closed:
@@ -115,6 +123,7 @@ class Puzzle:
                 return 1
         return 0
 
+# Execution Time: 0.04328298568725586 seconds
 
 # Create a Puzzle object and execute the process method
 puz = Puzzle()
