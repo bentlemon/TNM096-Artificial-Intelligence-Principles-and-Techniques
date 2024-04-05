@@ -66,10 +66,11 @@ class Puzzle:
     def h(self, start, goal):
         # Calculate the heuristic value (number of misplaced tiles) for a given state
         h1 = 0
-        for i in range(0, 3):
-            for j in range(0, 3):
-                if start[i][j] != goal[i][j] and start[i][j] != '_':
-                    h1 += 1
+        if self.open:  # Check if self.open is not empty
+            for i in range(0, 3):
+                for j in range(0, 3):
+                    if start[i][j] != goal[i][j] and start[i][j] != '_':
+                        h1 = 1 + self.open[0].level
         return h1
 
     def process(self):
@@ -78,9 +79,9 @@ class Puzzle:
   
         # Define the initial and goal states
         start = [
-            ['2', '5', '_'], 
-            ['1', '4', '8'], 
-            ['7', '3', '6']]
+            ['8', '6', '7'], 
+            ['2', '5', '4'], 
+            ['3', '_', '1']]
         goal = [
             ['1', '2', '3'], 
             ['4', '5', '6'], 
@@ -91,7 +92,8 @@ class Puzzle:
         print("\n\n")
         while True:
             cur = self.open[0]
-            iteration_count += 1  # Increment iteration counter
+            iteration_count += 1 
+            
             print("=====\n")
             for i in cur.data:
                 for j in i:
@@ -109,12 +111,15 @@ class Puzzle:
             self.closed.append(cur)
             del self.open[0]
             self.open.sort(key=lambda x: x.fval, reverse=False)
+            depth_level = cur.level  # Update the depth level for each iteration
 
         end_time = time.time()  # Record the ending time
         execution_time = end_time - start_time  # Calculate the execution time
-        
+
         print("Iterations:", iteration_count)  # Print the total number of iterations
         print("Execution Time:", execution_time, "seconds")  # Print the execution time
+        print("Depth level:", depth_level)  # Print the depth level of the last iteration
+
 
     def check_state(self, c):
         # Check if a state has already been visited
@@ -124,6 +129,7 @@ class Puzzle:
         return 0
 
 # Exection time: 0.10857725143432617 seconds
+# 31 depth in both 
 
 # Create a Puzzle object and execute the process method
 puz = Puzzle()
