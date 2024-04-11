@@ -1,130 +1,131 @@
-import time  # Import time module for time taking
+# lab1a
+import copy
+import heapq
+import time 
+import numpy as np
 
-class Node:
-    def __init__(self, data, level, fval):
-        # Initialize the node with the provided data, level, and fvalue
+class Node: 
+    def __init__(self, data, depth, fValue, parent=None):
         self.data = data
-        self.level = level
-        self.fval = fval
+        self.depth = depth
+        self.fValue = fValue
+        self.parent = parent
 
-    def generate_child(self):
-        # Generate child nodes by moving the blank space in four directions: up, down, left, right
-        x, y = self.find(self.data, '_')
-        # Define possible moves for the blank space
-        val_list = [[x, y - 1], [x, y + 1], [x - 1, y], [x + 1, y]]
-        children = []
-        for i in val_list:
-            # Attempt to move the blank space
-            child = self.shuffle(self.data, x, y, i[0], i[1])
-            if child is not None:
-                # Create a new node for the moved state
-                child_node = Node(child, self.level + 1, 0)
-                children.append(child_node)
-        return children
-
-    def shuffle(self, puz, x1, y1, x2, y2):
-        # Move the blank space to the specified coordinates and return the resulting state
-        if x2 >= 0 and x2 < len(self.data) and y2 >= 0 and y2 < len(self.data):
-            # If the move is within bounds, perform the move
-            temp_puz = self.copy(puz)
-            h1 = temp_puz[x2][y2]
-            temp_puz[x2][y2] = temp_puz[x1][y1]
-            temp_puz[x1][y1] = h1
-            return temp_puz
-        else:
-            # If the move is out of bounds, return None
-            return None
-
-    def copy(self, root):
-        # Create a copy of the given puzzle state
-        h1 = []
-        for i in root:
-            t = []
-            for j in i:
-                t.append(j)
-            h1.append(t)
-        return h1
-
-    def find(self, puz, x):
-        # Find the coordinates of a specific element in the puzzle state
+    def __lt__(self, other):
+        return self.fValue < other.fValue
+    
+    def find(self, puzzle, empty_space):
+        """Find the empty space"""
         for i in range(0, len(self.data)):
             for j in range(0, len(self.data)):
-                if puz[i][j] == x:
+                if puzzle[i][j] == empty_space:
                     return i, j
+                
+    def copy(self, puzzle):
+        temp = copy.deepcopy(puzzle)
+        return temp
+                
+    def move_empty(self, puzzle, x1, y1, x2, y2):
+        if x2 >= 0 and x2 < len(self.data) and y2 >= 0 and y2 < len(self.data): 
+            temp_puzzle = []
+            temp_puzzle = self.copy(puzzle)
+            temp = temp_puzzle[x2][y2]
+            temp_puzzle[x2][y2] = temp_puzzle[x1][y1]
+            temp_puzzle[x1][y1] = temp
+            return temp_puzzle
+        else:
+            return None
 
+    def generate_child(self):
+        x, y = self.find(self.data, "0")
+        pos_list = [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]
+        children = []
+        for i in pos_list:
+            child = self.move_empty(self.data, x, y, i[0], i[1])
+            if child is not None:
+                child_node = Node(child, self.depth + 1, 0, self)
+                children.append(child_node)
 
-class Puzzle:
+        return children
+
+class Puzzle: 
     def __init__(self):
-        # Initialize the open and closed lists
         self.open = []
-        self.closed = []
-
-    def f(self, start, goal):
-        # Calculate the f-value for a given state (f(x) = )
-        return self.h(start.data, goal)
-
-    def h(self, start, goal):
-        # Calculate the heuristic value (number of misplaced tiles) for a given state
-        h1 = 0
+        self.closed = set()
+    
+    def f_func(self, start_node, goal_node):
+        return self.h_func(start_node.data, goal_node) + start_node.depth
+    
+    def h_func(self, start, goal):
+        temp = 0
         for i in range(0, 3):
             for j in range(0, 3):
-                if start[i][j] != goal[i][j] and start[i][j] != '_':
-                    h1 += 1
-        return h1
+                if start[i][j] != goal[i][j] and start[i][j] != "0": # Then a tile is missplaced
+                    temp += 1
+        return temp
 
-    def process(self):
-        start_time = time.time()  # Record the starting time
-        iteration_count = 0  # Initialize iteration counter
-  
-        # Define the initial and goal states
-        start = [
-            ['2', '5', '_'], 
-            ['1', '4', '8'], 
-            ['7', '3', '6']]
-        goal = [
+    def printMoves(self, node):
+        if node is None:
+            print("No solution found.")
+            return
+        solution = []
+        while node is not None:
+            solution.append(node.data)
+            node = node.parent
+        solution.reverse()
+        print("Solution:")
+        for i in solution:
+            print("\n  | ")
+            print("  | ")
+            print(" \'/ \n")
+            for row in i:
+                print(" ".join(str(cell) for cell in row))
+
+    
+    def solve(self):
+        start_time = time.process_time()
+        start_state = [
+            ['8', '6', '7'], 
+            ['2', '5', '4'], 
+            ['3', '0', '1']]
+        goal_state = [
             ['1', '2', '3'], 
             ['4', '5', '6'], 
-            ['7', '8', '_']]
-        start = Node(start, 0, 0)
-        start.fval = self.f(start, goal)
-        self.open.append(start)
+            ['7', '8', '0']]
+
+        start = Node(start_state, 0, 0)
+        start.fValue = self.f_func(start, goal_state)
+        heapq.heappush(self.open, start)
         print("\n\n")
-        while True:
-            cur = self.open[0]
-            iteration_count += 1  # Increment iteration counter
-            print("=====\n")
-            for i in cur.data:
-                for j in i:
-                    print(j, end=" ")
-                print("")
-            print("h1 value:", self.h(cur.data, goal))  # Print h value for the current state
-            print("=====\n")
-            if self.h(cur.data, goal) == 0:
-                break
-            for i in cur.generate_child():
-                i.fval = self.f(i, goal)
-                if self.check_state(i.data) == 1:  # Check if state is already visited
-                    continue
-                self.open.append(i)
-            self.closed.append(cur)
-            del self.open[0]
-            self.open.sort(key=lambda x: x.fval, reverse=False)
 
-        end_time = time.time()  # Record the ending time
-        execution_time = end_time - start_time  # Calculate the execution time
+        # List for the moves to the solution
+        moves = []
         
-        print("Iterations:", iteration_count)  # Print the total number of iterations
-        print("Execution Time:", execution_time, "seconds")  # Print the execution time
+        while len(self.open) > 0:
+            current = heapq.heappop(self.open)
+                
+            if np.array_equal(current.data, goal_state):
+                elapsed_time = time.process_time() - start_time
+                self.printMoves(current)
+                return current.depth, elapsed_time, moves
 
-    def check_state(self, c):
-        # Check if a state has already been visited
-        for i in self.closed:
-            if i.data == c:
-                return 1
-        return 0
+            self.closed.add(tuple(map(tuple, current.data)))
+            
+            for i in current.generate_child():
+                i.fValue = self.f_func(i, goal_state)
+                    
+                if tuple(map(tuple, i.data)) not in self.closed:
+                    heapq.heappush(self.open, i)
+                    moves.append(i)
 
-# Exection time: 0.10857725143432617 seconds
+        elapsed_time = time.process_time() - start_time
 
-# Create a Puzzle object and execute the process method
+        self.printMoves(current)
+
+        return current.depth, elapsed_time, moves
+
 puz = Puzzle()
-puz.process()
+cost, duration, moves = puz.solve()
+print(f"\n\nSolution found in ({cost}) moves")
+# print(f"\n\n ({moves}) moves")
+print(f"\n\nSolution found in ({duration}) seconds")
