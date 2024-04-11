@@ -1,7 +1,7 @@
 import copy
 import heapq
 import time 
-import numpy as np
+
 class Node: 
     def __init__(self, data, depth, fValue, parent=None):
         self.data = data
