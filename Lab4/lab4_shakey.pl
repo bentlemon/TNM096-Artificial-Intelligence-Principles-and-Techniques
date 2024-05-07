@@ -48,9 +48,9 @@ act( push(B,X,Y),
 % (1). Move Shackey from room 3 to room 1 (he starts at room 3)
 %goal_state( [at(shackey, room1) ]).
 % (2). Switch off the light in room 1.
-%goal_state( [lightoff(room1) ]).
+goal_state( [lightoff(room1) ]).
 % (3). Get box 2 (in room 1) to room 2
-goal_state( [at(box2, room2) ]).
+%goal_state( [at(box2, room2) ]).
 
 % Setting up enviroment 
 initial_state(
