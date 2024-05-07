@@ -7,7 +7,7 @@
 % All actions shakey can take
 act( go(X,Y),                                               % action 
      [at(shackey, X), passage(X, Y)],                       % pre-conditions
-     [at(shackey, X)],                                      % delete
+     [at(shackey, X), on(shackey, floor)],                  % delete
      [at(shackey, Y)]                                       % add
      ).
 
